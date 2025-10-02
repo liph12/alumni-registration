@@ -7,12 +7,16 @@ interface MemberQRCodeProps {
   desktop: boolean;
   value: string;
   slug: string;
+  downloadable?: boolean;
+  marginY?: number;
 }
 
 export default function MemberQRCode({
   slug,
   value,
   desktop,
+  downloadable = true,
+  marginY = 5,
 }: MemberQRCodeProps) {
   const svgRef = useRef<SVGSVGElement>(null);
 
@@ -47,23 +51,25 @@ export default function MemberQRCode({
   };
 
   return (
-    <Box sx={{ my: 5 }}>
+    <Box sx={{ my: marginY }}>
       <Box sx={{ display: "flex", justifyContent: "center" }}>
         <Box sx={{ border: "5px solid gray", borderRadius: 5, padding: 2 }}>
           <QRCodeSVG ref={svgRef} value={value} size={desktop ? 150 : 100} />
         </Box>
       </Box>
-      <Button
-        variant="contained"
-        color="success"
-        size="small"
-        sx={{ borderRadius: 5, my: 1 }}
-        startIcon={<DownloadRoundedIcon />}
-        disableElevation
-        onClick={() => downloadAsPNG(svgRef)}
-      >
-        Save QR Code
-      </Button>
+      {downloadable && (
+        <Button
+          variant="contained"
+          color="success"
+          size="small"
+          sx={{ borderRadius: 5, my: 1 }}
+          startIcon={<DownloadRoundedIcon />}
+          disableElevation
+          onClick={() => downloadAsPNG(svgRef)}
+        >
+          Save QR Code
+        </Button>
+      )}
     </Box>
   );
 }

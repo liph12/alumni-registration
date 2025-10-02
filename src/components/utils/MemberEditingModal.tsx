@@ -15,9 +15,12 @@ import {
   Box,
   Chip,
   TextField,
+  Grid,
 } from "@mui/material";
 import { HistoryRounded, Payment, Star, Check } from "@mui/icons-material";
 import type { Status, Member, FormFields } from "../Dashboard";
+import MemberQRCode from "../MemberQRCode";
+import { useAppContext } from "../../providers/AppContextProvider";
 
 interface MemberEditingModalProps {
   open: boolean;
@@ -61,9 +64,11 @@ export default function MemberEditingModal({
   onStatusUpdate,
   onUpdate,
 }: MemberEditingModalProps) {
+  const { desktop } = useAppContext();
   const [selectedStatus, setSelectedStatus] = useState<Status>("pending");
   const [amountPaid, setAmountPaid] = useState<string>("100");
   const [amountSponsored, setAmountSponsored] = useState<string>("0");
+  const [memberForm, setMemberForm] = useState<Member | null>(null);
 
   const formatNumber = (value: string) => {
     const cleaned = value.replace(/[^0-9]/g, "");
@@ -84,9 +89,15 @@ export default function MemberEditingModal({
     setAmountPaid(formatNumber(rawValue));
   };
 
+  const handleChangeMemberForm = (e: React.ChangeEvent<HTMLInputElement>) =>
+    setMemberForm(
+      (prev) => ({ ...prev, [e.target.name]: e.target.value } as Member)
+    );
+
   useEffect(() => {
     if (member) {
       setSelectedStatus(member.status);
+      setMemberForm(member);
     }
   }, [member]);
 
@@ -95,6 +106,9 @@ export default function MemberEditingModal({
       const amountS = Number(amountSponsored.replace(/,/g, ""));
       const amountP = Number(amountPaid.replace(/,/g, ""));
       const params: FormFields = {
+        first_name: memberForm?.first_name ?? "",
+        last_name: memberForm?.last_name ?? "",
+        batch_year: memberForm?.batch_year ?? "",
         status: selectedStatus,
         amount_paid:
           selectedStatus === "paid" || selectedStatus === "sponsored"
@@ -133,9 +147,95 @@ export default function MemberEditingModal({
           <Typography variant="subtitle1" sx={{ fontWeight: 500, mb: 1 }}>
             Member Information
           </Typography>
-          <Typography variant="body1" color="text.secondary">
+          <Typography variant="body1" color="text.secondary" sx={{ mb: 3 }}>
             {member.name} • {member.email}
           </Typography>
+          <Grid container spacing={3}>
+            <Grid size={{ lg: 4, md: 6, xs: 12 }}>
+              <TextField
+                sx={{
+                  mb: 2,
+                  fontSize: "1.2rem",
+                  borderRadius: 5,
+                  "& .MuiOutlinedInput-root": {
+                    borderRadius: 5,
+                  },
+                  "& .MuiOutlinedInput-notchedOutline": {
+                    borderRadius: 5,
+                  },
+                }}
+                color="success"
+                size="small"
+                fullWidth
+                label="Firstname"
+                value={memberForm?.first_name}
+                onChange={handleChangeMemberForm}
+                name="first_name"
+                required
+              />
+            </Grid>
+            <Grid size={{ lg: 4, md: 6, xs: 12 }}>
+              <TextField
+                sx={{
+                  mb: 2,
+                  fontSize: "1.2rem",
+                  borderRadius: 5,
+                  "& .MuiOutlinedInput-root": {
+                    borderRadius: 5,
+                  },
+                  "& .MuiOutlinedInput-notchedOutline": {
+                    borderRadius: 5,
+                  },
+                }}
+                color="success"
+                size="small"
+                fullWidth
+                label="Lastname"
+                value={memberForm?.last_name}
+                onChange={handleChangeMemberForm}
+                name="last_name"
+                required
+              />
+            </Grid>
+            <Grid size={{ lg: 4, md: 6, xs: 12 }}>
+              <TextField
+                sx={{
+                  mb: 2,
+                  fontSize: "1.2rem",
+                  borderRadius: 5,
+                  "& .MuiOutlinedInput-root": {
+                    borderRadius: 5,
+                  },
+                  "& .MuiOutlinedInput-notchedOutline": {
+                    borderRadius: 5,
+                  },
+                }}
+                color="success"
+                size="small"
+                fullWidth
+                label="Batch"
+                value={memberForm?.batch_year}
+                onChange={handleChangeMemberForm}
+                name="batch_year"
+                required
+              />
+            </Grid>
+            <Grid size={{ lg: 4, md: 6, xs: 12 }}></Grid>
+            <Grid size={{ lg: 4, md: 6, xs: 12 }}>
+              {member && (
+                <MemberQRCode
+                  marginY={2}
+                  downloadable={false}
+                  slug={""}
+                  value={`${
+                    member?.id
+                  }_cnhs_alumni_${new Date().getFullYear()}`}
+                  desktop={desktop}
+                />
+              )}
+            </Grid>
+            <Grid size={{ lg: 4, md: 6, xs: 12 }}></Grid>
+          </Grid>
           <Box sx={{ mt: 1 }}>
             <Chip
               label={`${statusConfig[member.status].label}`}
@@ -270,12 +370,12 @@ export default function MemberEditingModal({
           variant="contained"
           color="success"
           size="small"
-          disabled={selectedStatus === member.status}
+          // disabled={selectedStatus === member.status}
           disableElevation
           sx={{ borderRadius: 5, textTransform: "none" }}
           loading={onUpdate}
         >
-          Update Status
+          Update
         </Button>
       </DialogActions>
     </Dialog>

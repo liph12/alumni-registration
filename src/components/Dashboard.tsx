@@ -14,6 +14,9 @@ import axios from "axios";
 import { useNavigate } from "react-router-dom";
 
 export interface FormFields {
+  first_name: string;
+  last_name: string;
+  batch_year: string;
   status: Status;
   amount_paid: number;
   amount_sponsored: number;
@@ -21,16 +24,22 @@ export interface FormFields {
 
 export type Status = "active" | "paid" | "pending" | "sponsored";
 
+export type CapturedStatus = "valid" | "invalid" | "pending";
+
 export interface Member {
   id: number;
   index: number;
   name: string;
+  first_name: string;
+  last_name: string;
   email: string;
   mobile_number: string;
   batch_year: string;
   status: Status;
   paid_amount: number;
   sponsored_amount: number;
+  captured_status: CapturedStatus;
+  captured_at_timestamp: string;
 }
 
 export interface Trend {
@@ -87,6 +96,10 @@ export default function Dashboard() {
             member.id === data.id
               ? {
                   ...member,
+                  name: data.name,
+                  first_name: data.first_name,
+                  last_name: data.last_name,
+                  batch_year: data.batch_year,
                   status: data.status,
                   paid_amount: data.paid_amount,
                   sponsored_amount: data.sponsored_amount,
